@@ -1,5 +1,12 @@
 <template>
   <div>
+    <el-switch
+      v-model="draggable"
+      active-text="开启拖拽"
+      inactive-text="关闭拖拽"
+    >
+    </el-switch>
+    <!-- <el-button v-if="draggable" @click="butchSave">批量保存</el-button> -->
     <el-tree
       :data="menus"
       :props="defaultProps"
@@ -7,7 +14,7 @@
       show-checkbox
       node-key="catId"
       :default-expanded-keys="expandKey"
-      draggable
+      :draggable="draggable"
       :allow-drop="allowDrop"
       @node-drop="handleDrop"
     >
@@ -77,6 +84,7 @@ export default {
   props: {},
   data() {
     return {
+      draggable: false,
       updateNodes: [],
       maxLevel: 0,
       title: "", // 添加 | 修改
@@ -116,6 +124,10 @@ export default {
         this.menus = data.data;
       });
     },
+
+    // batchSave() { 
+    //   // 批量保存有问题 要去重 先不写了
+    // },
 
     // 拖拽完成监听事件
     handleDrop(draggingNode, dropNode, dropType, ev) {
@@ -192,11 +204,11 @@ export default {
 
     allowDrop(draggingNode, dropNode, type) {
       // 初始化
-      this.maxLevel = draggingNode.data.catLevel;
+      this.maxLevel = draggingNode.level;
       // console.log("allowDrop", draggingNode, dropNode, type);
-      this.countNodeLevel(draggingNode.data);
+      this.countNodeLevel(draggingNode);
       // 被拖节点下挂层数
-      let deep = this.maxLevel - draggingNode.data.catLevel + 1;
+      let deep = this.maxLevel - draggingNode.level + 1;
       // console.log("deep", deep);
       if (type === "inner") {
         // console.log("dropNode.level", dropNode.level);
@@ -208,12 +220,12 @@ export default {
     },
     countNodeLevel(node) {
       // 找到所有子节点 求最大深度
-      if (node.children != null && node.children.length > 0) {
-        for (let i = 0; i < node.children.length; i++) {
-          if (node.children[i].catLevel > this.maxLevel) {
-            this.maxLevel = node.children[i].catLevel;
+      if (node.childNodes != null && node.childNodes.length > 0) {
+        for (let i = 0; i < node.childNodes.length; i++) {
+          if (node.childNodes[i].level > this.maxLevel) {
+            this.maxLevel = node.childNodes[i].level;
           }
-          this.countNodeLevel(node.children[i]);
+          this.countNodeLevel(node.childNodes[i]);
         }
       }
     },
