@@ -7,6 +7,7 @@
     >
     </el-switch>
     <!-- <el-button v-if="draggable" @click="butchSave">批量保存</el-button> -->
+    <el-button type="danger" @click="batchDelete">批量删除</el-button>
     <el-tree
       :data="menus"
       :props="defaultProps"
@@ -17,6 +18,7 @@
       :draggable="draggable"
       :allow-drop="allowDrop"
       @node-drop="handleDrop"
+      ref="menuTree"
     >
       <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
@@ -125,8 +127,41 @@ export default {
       });
     },
 
+    batchDelete() {
+      let checkedNodes = this.$refs.menuTree.getCheckedNodes();
+      if (checkedNodes.length === 0) {
+        this.$message.warning("请先选择要删除的分类");
+        return;
+      }
+      let catIds = checkedNodes.map((item) => item.catId);
+      this.$confirm(`是否删除选中的分类？`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$http({
+            url: this.$http.adornUrl("/product/category/delete"),
+            method: "post",
+            data: this.$http.adornData(catIds, false),
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: "分类删除成功",
+                type: "success",
+              });
+              // 刷新菜单
+              this.getMenus();
+            } else {
+              this.$message.error(data.msg);
+            }
+          });
+        })
+        .catch(() => {});
+    },
+
     // batchSave() { 
-    //   // 批量保存有问题 要去重 先不写了
+    //   // 批量保存有问题 要去重(或者说要有先后 对每个节点只保存最后一次的数据) 先不写了
     // },
 
     // 拖拽完成监听事件
