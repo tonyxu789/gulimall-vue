@@ -6,7 +6,10 @@
       inactive-text="关闭拖拽"
     >
     </el-switch>
+    
+    <!-- 批量保存有bug 暂时不支持 -->
     <!-- <el-button v-if="draggable" @click="butchSave">批量保存</el-button> -->
+
     <el-button type="danger" @click="batchDelete">批量删除</el-button>
     <el-tree
       :data="menus"
