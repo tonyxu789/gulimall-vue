@@ -128,12 +128,13 @@
                     v-show="false"
                   ></el-input>
                   <el-checkbox-group v-model="dataResp.tempSaleAttrs[aidx].attrValues">
-                    <el-checkbox
-                      v-if="dataResp.saleAttrs[aidx].valueSelect != ''"
-                      :label="val"
-                      v-for="val in dataResp.saleAttrs[aidx].valueSelect.split(';')"
-                      :key="val"
-                    ></el-checkbox>
+                    <template v-if="dataResp.saleAttrs[aidx] && dataResp.saleAttrs[aidx].valueSelect != ''">
+                      <el-checkbox 
+                        v-for="val in dataResp.saleAttrs[aidx].valueSelect.split(';')"
+                        :key="val"
+                        :label="val"
+                      ></el-checkbox>
+                    </template>
                     <div style="margin-left:20px;display:inline">
                       <el-button
                         v-show="!inputVisible[aidx].view"
